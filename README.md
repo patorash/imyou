@@ -1,5 +1,7 @@
 # Imyou
 
+[![Build Status](https://travis-ci.org/patorash/imyou.svg?branch=master)](https://travis-ci.org/patorash/imyou)
+
 Imyou has feature of attaching popular name to ActiveRecord model.
 
 Imyou mean nickname in japanease.
