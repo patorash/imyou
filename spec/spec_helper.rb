@@ -1,5 +1,11 @@
+require 'rubygems'
 require "bundler/setup"
 require "imyou"
+require 'combustion'
+require 'database_cleaner'
+require 'pry'
+
+Combustion.initialize! :active_record
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -10,5 +16,15 @@ RSpec.configure do |config|
 
   config.expect_with :rspec do |c|
     c.syntax = :expect
+  end
+
+  config.before :suite do
+    DatabaseCleaner.strategy = :truncation
+  end
+  config.before :each do
+    DatabaseCleaner.start
+  end
+  config.after :each do
+    DatabaseCleaner.clean
   end
 end

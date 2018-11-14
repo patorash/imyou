@@ -1,0 +1,6 @@
+test:
+  adapter: postgresql
+  encoding: unicode
+  host: localhost
+  database: imyou
+  min_messages: WARNING

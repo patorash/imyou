@@ -1,5 +1,11 @@
 require "imyou/version"
+require 'active_record'
+require 'active_support/inflector'
 
 module Imyou
-  # Your code goes here...
+  if defined?(ActiveRecord::Base)
+    require 'imyou/models'
+    require 'imyou/nickname'
+    ActiveRecord::Base.extend Imyou::Models
+  end
 end

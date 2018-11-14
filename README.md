@@ -1,10 +1,12 @@
 # Imyou
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/imyou`. To experiment with that code, run `bin/console` for an interactive prompt.
+Imyou has feature of attaching popular name to ActiveRecord model.
 
-TODO: Delete this and the text above, and describe your gem
+Imyou mean nickname in japanease.
 
 ## Installation
+
+### Rails 4.x and 5.x
 
 Add this line to your application's Gemfile:
 
@@ -20,9 +22,49 @@ Or install it yourself as:
 
     $ gem install imyou
 
+### Database Migrations
+
+Imyou uses a imyou_nicknames table to store popular names information.
+To generate and run the migration just use.
+
+    $ rails generate imyou:migration
+    $ rails db:migrate
+
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+class User < ApplicationRecord
+  has_imyou
+end
+
+@user = User.new(name: 'hoge')
+
+# Add nickname.
+@user.add_nickname('foo')
+@user.nicknames # => ['foo']
+
+# Add nicknames by Array.
+@user.nicknames = %w(foo bar baz)
+@user.nicknames # => ['foo', 'bar', 'baz']
+
+# eager_load(LEFT OUTER JOIN)
+User.with_nicknames
+
+# Search users by nickname.
+User.match_by_nickname('baz').exists? # => true
+User.match_by_nickname('ba').exists?  # => false
+User.partial_match_by_nickname('baz').exists? # => true
+User.partial_match_by_nickname('ba').exists?  # => true
+
+# Remove nickname.
+@user.remove_nickname('foo')
+@user.nicknames # => ['bar', 'baz']
+
+# Remove all nicknames.
+@user.remove_all_nicknames
+@user.nicknames # => []
+```
+
 
 ## Development
 
@@ -32,7 +74,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/imyou. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/patorash/imyou. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 
