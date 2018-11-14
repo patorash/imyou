@@ -2,6 +2,7 @@ require 'imyou/nickname'
 
 RSpec.describe Imyou::Nickname do
   let(:user) { User.create!(name: 'user_name') }
+  let(:no_name_user) { NoNameUser.create! }
 
   it 'should not have imyou' do
     expect(NotUser).not_to have_imyou
@@ -15,6 +16,7 @@ RSpec.describe Imyou::Nickname do
     before do
       %w(foo bar baz).each do |nickname|
         user.imyou_nicknames.create!(name: nickname)
+        no_name_user.imyou_nicknames.create!(name: nickname)
       end
     end
 
@@ -47,14 +49,37 @@ RSpec.describe Imyou::Nickname do
       it 'should exists' do
         expect(User.match_by_nickname('baz')).to be_exists
         expect(User.match_by_nickname('az')).not_to be_exists
+
+        expect(NoNameUser.match_by_nickname('baz')).to be_exists
+        expect(NoNameUser.match_by_nickname('az')).not_to be_exists
+      end
+
+      it 'should search by users.name' do
+        expect(User.match_by_nickname('user_name')).to be_exists
+      end
+
+      context 'If with_name_column = false' do
+        it 'should not search by users.name' do
+          expect(User.match_by_nickname('user_name', with_name_column: false)).not_to be_exists
+        end
       end
     end
 
     context '#partial_match_by_nickname' do
-      subject { User.partial_match_by_nickname('az') }
-
       it 'should exists' do
-        expect(subject).to be_exists
+        expect(User.partial_match_by_nickname('az')).to be_exists
+        expect(NoNameUser.partial_match_by_nickname('az')).to be_exists
+      end
+
+      it 'should search by users.name' do
+        expect(User.partial_match_by_nickname('user')).to be_exists
+        expect(User.partial_match_by_nickname('er_na')).to be_exists
+      end
+
+      context 'If with_name_column = false' do
+        it 'should not search by users.name' do
+          expect(User.partial_match_by_nickname('user', with_name_column: false)).not_to be_exists
+        end
       end
     end
 

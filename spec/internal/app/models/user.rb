@@ -1,3 +1,3 @@
 class User < ActiveRecord::Base
-  has_imyou
+  has_imyou :name
 end
