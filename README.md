@@ -36,27 +36,51 @@ To generate and run the migration just use.
 
 ```ruby
 class User < ApplicationRecord
-  has_imyou
+  has_imyou 
+end
+
+class Book < ApplicationRecord
+  has_imyou :title # add search target column
 end
 
 @user = User.new(name: 'hoge')
+@book = Book.new(title: 'book')
 
 # Add nickname.
 @user.add_nickname('foo')
 @user.nicknames # => ['foo']
 
+@book.add_nickname('red')
+@book.nicknames # => ['red']
+
 # Add nicknames by Array.
 @user.nicknames = %w(foo bar baz)
 @user.nicknames # => ['foo', 'bar', 'baz']
+
+@book.nicknames = %w(red green blue)
+@book.nicknames # => ['red', 'green', 'blue']
 
 # eager_load(LEFT OUTER JOIN)
 User.with_nicknames
 
 # Search users by nickname.
+User.match_by_nickname('hoge').exists? # => false
 User.match_by_nickname('baz').exists? # => true
 User.match_by_nickname('ba').exists?  # => false
+
+User.partial_match_by_nickname('ho').exists? # => true
 User.partial_match_by_nickname('baz').exists? # => true
 User.partial_match_by_nickname('ba').exists?  # => true
+
+# Search books by nickname.
+Book.match_by_nickname('book').exists? # => true 
+Book.match_by_nickname('book', with_name_column: false).exists? # => false 
+Book.match_by_nickname('red').exists? # => true 
+Book.match_by_nickname('yellow').exists? # => false 
+
+Book.partial_match_by_nickname('bo').exists? # => true 
+Book.partial_match_by_nickname('bo', with_name_column: false).exists? # => false 
+Book.partial_match_by_nickname('re').exists? # => true 
 
 # Remove nickname.
 @user.remove_nickname('foo')
