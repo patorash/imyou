@@ -88,6 +88,16 @@ RSpec.describe Imyou::Nickname do
         user.nicknames = %w(foo hoge bar)
         expect(user.nicknames).to match_array %w(foo hoge bar)
       end
+
+      it 'can remove nicknames' do
+        user.nicknames = []
+        expect(user.nicknames).to eq []
+      end
+
+      it 'can remove nicknames by nil' do
+        user.nicknames = nil
+        expect(user.nicknames).to eq []
+      end
     end
 
     context '#add_nickname' do

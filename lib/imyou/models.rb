@@ -81,9 +81,13 @@ module Imyou
         end
 
         def nicknames=(new_nicknames)
-          self.imyou_nicknames.where.not(name: new_nicknames).delete_all
-          new_nicknames.each do |new_nickname|
-            self.imyou_nicknames.find_or_create_by(name: new_nickname)
+          if new_nicknames.blank?
+            self.imyou_nicknames.delete_all
+          else
+            self.imyou_nicknames.where.not(name: new_nicknames).delete_all
+            new_nicknames.each do |new_nickname|
+              self.imyou_nicknames.find_or_create_by(name: new_nickname)
+            end
           end
         end
       end
