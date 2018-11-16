@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    imyou (1.1.1)
+    imyou (1.1.2)
 
 GEM
   remote: https://rubygems.org/
