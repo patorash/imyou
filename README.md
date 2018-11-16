@@ -60,7 +60,7 @@ end
 @book.nicknames = %w(red green blue)
 @book.nicknames # => ['red', 'green', 'blue']
 
-# eager_load(LEFT OUTER JOIN)
+# preload
 User.with_nicknames
 
 # Search users by nickname.
