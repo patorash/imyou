@@ -8,6 +8,11 @@ module Imyou
       class_eval do
 
         has_many :imyou_nicknames, -> { order(id: :asc) }, class_name: 'Imyou::Nickname', as: :model, dependent: :destroy
+
+        accepts_nested_attributes_for :imyou_nicknames,
+                                      allow_destroy: true,
+                                      reject_if: ->(attributes) { attributes['name'].blank? }
+
         scope :with_nicknames, -> { preload(:imyou_nicknames) }
 
         scope :match_by_nickname, ->(nickname, with_name_column: true) do
@@ -117,14 +122,12 @@ module Imyou
             new_nicknames&.each do |new_nickname|
               self.imyou_nicknames.build(name: new_nickname)
             end
+          elsif new_nicknames.blank?
+              self.remove_all_nicknames
           else
-            if new_nicknames.blank?
-              self.imyou_nicknames.delete_all
-            else
-              self.imyou_nicknames.where.not(name: new_nicknames).delete_all
-              new_nicknames.each do |new_nickname|
-                self.imyou_nicknames.find_or_create_by(name: new_nickname)
-              end
+            self.imyou_nicknames.where.not(name: new_nicknames).delete_all
+            new_nicknames.each do |new_nickname|
+              self.imyou_nicknames.find_or_create_by(name: new_nickname)
             end
           end
         end

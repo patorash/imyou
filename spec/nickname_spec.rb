@@ -173,5 +173,62 @@ RSpec.describe Imyou::Nickname do
         end
       end
     end
+
+    # TODO: accepts_nested_attributes_forのテストを書く
+    context 'accepts_nested_attributes_for' do
+      it 'should register nicknames' do
+        params = {
+            imyou_nicknames_attributes: [
+                { name: 'hoge' },
+                { name: 'piyo' },
+                { name: 'fuga' },
+            ]
+        }
+        expect do
+          user.update(params)
+        end.to change { user.nicknames.size }.from(3).to(6)
+        expect(user.nicknames).to match_array %w(foo bar baz hoge piyo fuga)
+      end
+
+      it 'should destroy nicknames' do
+        params = {
+            imyou_nicknames_attributes: [
+                { id: user.imyou_nicknames.first.id, _destroy: '1' },
+                { id: user.imyou_nicknames.second.id, _destroy: '1' }
+            ]
+        }
+        expect do
+          user.update(params)
+        end.to change { user.nicknames.size }.from(3).to(1)
+        expect(user.nicknames).to match_array %w(baz)
+      end
+
+      it 'should reject blank name attributes' do
+        params = {
+            imyou_nicknames_attributes: [
+                { name: 'hoge' },
+                { name: 'piyo' },
+                { name: '' }, # reject
+            ]
+        }
+        expect do
+          user.update(params)
+        end.to change { user.nicknames.size }.from(3).to(5)
+        expect(user.nicknames).to match_array %w(foo bar baz hoge piyo)
+      end
+
+      it 'complex conditions' do
+        params = {
+            imyou_nicknames_attributes: [
+                { name: 'hoge' }, # create
+                { id: user.imyou_nicknames.first.id, _destroy: '1' }, # destroy
+                { id: user.imyou_nicknames.second.id, name: 'piyo' }, # update
+                { id: user.imyou_nicknames.last.id, name: '' }, #reject(not update)
+            ]
+        }
+        user.update(params)
+        expect(user.nicknames).to match_array %w(piyo baz hoge)
+      end
+    end
   end
 end

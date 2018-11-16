@@ -4,7 +4,7 @@ module Imyou
     belongs_to :model, polymorphic: true
 
     scope :by_type, -> (klass) { where(model_type: klass.name) }
-    scope :default_order, -> { order(created_at: :asc) }
+    scope :default_order, -> { order(id: :asc) }
     default_scope { default_order }
 
     validates :name, presence: true
