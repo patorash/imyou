@@ -14,9 +14,7 @@ class ImyouMigration < ActiveRecord::Migration<%= migration_version %>
 
   def self.down
     remove_index :imyou_nicknames, :name
-    remove_index :imyou_nicknames,
-                 [ :name, :model_id, :model_type ],
-                 name: 'imyou_unique_name'
+    remove_index :imyou_nicknames, name: 'imyou_unique_name'
     drop_table :imyou_nicknames
   end
 end
