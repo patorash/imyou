@@ -1,4 +1,4 @@
-class IMyouMigration < ActiveRecord::Migration<%= migration_version %>
+class ImyouMigration < ActiveRecord::Migration<%= migration_version %>
   def self.up
     create_table :imyou_nicknames do |t|
       t.references :model, polymorphic: true
