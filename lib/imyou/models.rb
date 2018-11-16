@@ -7,24 +7,32 @@ module Imyou
     def has_imyou(name_column=nil)
       class_eval do
 
-        has_many :imyou_nicknames, class_name: 'Imyou::Nickname', as: :model, dependent: :destroy
-        scope :with_nicknames, -> { eager_load(:imyou_nicknames) }
+        has_many :imyou_nicknames, -> { order(id: :asc) }, class_name: 'Imyou::Nickname', as: :model, dependent: :destroy
+        scope :with_nicknames, -> { preload(:imyou_nicknames) }
 
         scope :match_by_nickname, ->(nickname, with_name_column: true) do
           if Gem::Version.new(ActiveRecord.version) >= Gem::Version.new(5)
-            records = self.with_nicknames.where(Imyou::Nickname.arel_table[:name].eq(nickname))
+            records = self.left_outer_joins(:imyou_nicknames).where(Imyou::Nickname.arel_table[:name].eq(nickname))
             unless name_column.nil? || with_name_column == false
-              records.or!(self.with_nicknames.where(name_column => nickname))
+              records.or!(self.left_outer_joins(:imyou_nicknames).where(name_column => nickname))
             end
           else
+            joined_records = self.joins(<<~SQL
+              LEFT OUTER JOIN #{Imyou::Nickname.quoted_table_name}
+              ON
+                #{Imyou::Nickname.quoted_table_name}.#{connection.quote_column_name(:model_id)} = #{self.quoted_table_name}.#{connection.quote_column_name(:id)}
+                AND
+                #{Imyou::Nickname.quoted_table_name}.#{connection.quote_column_name(:model_type)} = #{connection.quote(self.name)}
+            SQL
+            )
             arel_nickname_column = Imyou::Nickname.arel_table[:name]
             records = if name_column.nil? || with_name_column == false
-                        self.with_nicknames.where(
+                        joined_records.where(
                             arel_nickname_column.eq(nickname)
                         )
                       else
                         arel_name_column = self.arel_table[name_column]
-                        self.with_nicknames.where(
+                        joined_records.where(
                             arel_nickname_column.eq(nickname).or(
                                 arel_name_column.eq(nickname)
                             )
@@ -36,21 +44,29 @@ module Imyou
 
         scope :partial_match_by_nickname, ->(nickname, with_name_column: true) do
           if Gem::Version.new(ActiveRecord.version) >= Gem::Version.new(5)
-            records = self.with_nicknames.where(Imyou::Nickname.arel_table[:name].matches("%#{sanitize_sql_like(nickname)}%"))
+            records = self.left_outer_joins(:imyou_nicknames).where(Imyou::Nickname.arel_table[:name].matches("%#{sanitize_sql_like(nickname)}%"))
             unless name_column.nil? || with_name_column == false
-              records.or!(self.with_nicknames.where(
+              records.or!(self.left_outer_joins(:imyou_nicknames).where(
                   self.arel_table[name_column].matches("%#{sanitize_sql_like(nickname)}%"))
               )
             end
           else
+            joined_records = self.joins(<<~SQL
+              LEFT OUTER JOIN #{Imyou::Nickname.quoted_table_name}
+              ON
+                #{Imyou::Nickname.quoted_table_name}.#{connection.quote_column_name(:model_id)} = #{self.quoted_table_name}.#{connection.quote_column_name(:id)}
+                AND
+                #{Imyou::Nickname.quoted_table_name}.#{connection.quote_column_name(:model_type)} = #{connection.quote(self.name)}
+            SQL
+            )
             arel_nickname_column = Imyou::Nickname.arel_table[:name]
             records = if name_column.nil? || with_name_column == false
-                        self.with_nicknames.where(
+                        joined_records.where(
                             arel_nickname_column.matches("%#{sanitize_sql_like(nickname)}%")
                         )
                       else
                         arel_name_column = self.arel_table[name_column]
-                        self.with_nicknames.where(
+                        joined_records.where(
                             arel_nickname_column.matches("%#{sanitize_sql_like(nickname)}%").or(
                                 arel_name_column.matches("%#{sanitize_sql_like(nickname)}%")
                             )
