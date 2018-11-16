@@ -81,7 +81,11 @@ module Imyou
         end
 
         def nicknames
-          self.imyou_nicknames.pluck(:name)
+          if new_record?
+            self.imyou_nicknames.map(&:name)
+          else
+            self.imyou_nicknames.pluck(:name)
+          end
         end
 
         def remove_all_nicknames
@@ -89,20 +93,38 @@ module Imyou
         end
 
         def add_nickname(nickname)
-          self.imyou_nicknames.create!(name: nickname)
+          if new_record?
+            self.imyou_nicknames.build(name: nickname)
+          else
+            self.imyou_nicknames.find_or_create_by(name: nickname)
+          end
         end
 
         def remove_nickname(nickname)
-          self.imyou_nicknames.find_by(name: nickname)&.destroy!
+          if new_record?
+            array = self.imyou_nicknames.to_a.delete_if do |imyou_nickname|
+              imyou_nickname.name == nickname
+            end
+            self.imyou_nicknames.replace(array)
+            true
+          else
+            self.imyou_nicknames.find_by(name: nickname)&.destroy!
+          end
         end
 
         def nicknames=(new_nicknames)
-          if new_nicknames.blank?
-            self.imyou_nicknames.delete_all
+          if new_record?
+            new_nicknames&.each do |new_nickname|
+              self.imyou_nicknames.build(name: new_nickname)
+            end
           else
-            self.imyou_nicknames.where.not(name: new_nicknames).delete_all
-            new_nicknames.each do |new_nickname|
-              self.imyou_nicknames.find_or_create_by(name: new_nickname)
+            if new_nicknames.blank?
+              self.imyou_nicknames.delete_all
+            else
+              self.imyou_nicknames.where.not(name: new_nicknames).delete_all
+              new_nicknames.each do |new_nickname|
+                self.imyou_nicknames.find_or_create_by(name: new_nickname)
+              end
             end
           end
         end

@@ -3,6 +3,7 @@ require 'imyou/nickname'
 RSpec.describe Imyou::Nickname do
   let(:user) { User.create!(name: 'user_name') }
   let(:no_name_user) { NoNameUser.create! }
+  let(:new_user) { User.new(name: 'new_user_name') }
 
   it 'should not have imyou' do
     expect(NotUser).not_to have_imyou
@@ -83,20 +84,44 @@ RSpec.describe Imyou::Nickname do
       end
     end
 
-    context '#nicknames=' do
-      it 'register new nicknames' do
-        user.nicknames = %w(foo hoge bar)
-        expect(user.nicknames).to match_array %w(foo hoge bar)
+    describe '#nicknames=' do
+      context 'If user is registerd,' do
+        it 'register new nicknames' do
+          user.nicknames = %w(foo hoge bar)
+          expect(user.nicknames).to match_array %w(foo hoge bar)
+        end
+
+        it 'can remove nicknames' do
+          user.nicknames = []
+          expect(user.nicknames).to eq []
+        end
+
+        it 'can remove nicknames by nil' do
+          user.nicknames = nil
+          expect(user.nicknames).to eq []
+        end
       end
 
-      it 'can remove nicknames' do
-        user.nicknames = []
-        expect(user.nicknames).to eq []
-      end
+      context 'If user is new_record,' do
+        it 'build new nicknames' do
+          new_user.nicknames = %w(foo hoge bar)
+          expect(new_user.save).to be true
+          expect(new_user.imyou_nicknames.all?(&:persisted?)).to be true
+          expect(new_user.nicknames).to match_array %w(foo hoge bar)
+        end
 
-      it 'can remove nicknames by nil' do
-        user.nicknames = nil
-        expect(user.nicknames).to eq []
+        it 'can remove nicknames' do
+          new_user.nicknames = []
+          expect(new_user.save).to be true
+          expect(new_user.nicknames).to eq []
+        end
+
+        it 'can remove nicknames by nil' do
+          new_user.nicknames = nil
+          expect(new_user.save).to be true
+          expect(new_user.nicknames).to eq []
+        end
+
       end
     end
 
@@ -107,18 +132,45 @@ RSpec.describe Imyou::Nickname do
       end
     end
 
-    context '#remove_nickname' do
-      it 'remove nickname' do
-        expect(user.remove_nickname('foo')).to be_truthy
-        expect(user.nicknames).to match_array %w(bar baz)
+    describe '#remove_nickname' do
+      context 'If user registered' do
+        it 'remove nickname' do
+          expect(user.remove_nickname('foo')).to be_truthy
+          expect(user.nicknames).to match_array %w(bar baz)
+        end
+      end
+
+      context 'If user is new_record,' do
+        before do
+          new_user.nicknames = %w(foo bar baz)
+        end
+
+        it 'remove nickname' do
+          expect(new_user.remove_nickname('foo')).to be_truthy
+          expect(new_user.nicknames).to match_array %w(bar baz)
+        end
       end
     end
 
-    context '#remove_all_nicknames' do
-      it 'remove all nicknames' do
-        expect do
-          user.remove_all_nicknames
-        end.to change { user.nicknames.size }.from(3).to(0)
+    describe '#remove_all_nicknames' do
+      context 'If user registered' do
+        it 'remove all nicknames' do
+          expect do
+            user.remove_all_nicknames
+          end.to change { user.nicknames.size }.from(3).to(0)
+        end
+      end
+
+      context 'If user is new_record,' do
+        before do
+          new_user.nicknames = %w(foo bar baz)
+        end
+
+        it 'remove all nicknames' do
+          expect do
+            new_user.remove_all_nicknames
+          end.to change { new_user.imyou_nicknames.size }.from(3).to(0)
+        end
       end
     end
   end

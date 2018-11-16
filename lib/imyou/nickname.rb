@@ -7,8 +7,6 @@ module Imyou
     scope :default_order, -> { order(created_at: :asc) }
     default_scope { default_order }
 
-    validates :model_id, presence: true
-    validates :model_type, presence: true
     validates :name, presence: true
     validates_uniqueness_of :name, scope: [ :model_id, :model_type ]
   end
