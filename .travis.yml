@@ -1,7 +1,8 @@
 sudo: false
 language: ruby
 rvm:
-  - 2.5.3
+  - 2.6.2
+  - 2.5.5
   - 2.4.5
   - 2.3.8
 gemfile:
@@ -14,4 +15,4 @@ branches:
     - master
     - travis
 
-before_install: gem install bundler -v 1.16.2
+before_install: gem install bundler -v 1.16.6
