@@ -15,4 +15,4 @@ branches:
     - master
     - travis
 
-before_install: gem install bundler -v 2.0.1 -N
+before_install: gem install bundler -v 1.17.3 -N
