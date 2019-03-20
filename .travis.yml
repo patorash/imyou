@@ -18,5 +18,5 @@ branches:
 before_install:
   - rvm use @global
   - gem uninstall bundler -x || gem uninstall bundler -a || true
-  - gem install bundler -v 1.17.3
+  - gem install bundler -v 1.17.3 --force
   - bundler --version
