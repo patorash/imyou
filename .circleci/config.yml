@@ -4,20 +4,19 @@ orbs:
   ruby-orbs: sue445/ruby-orbs@1.4.3
 
 executors:
-  ruby_2_5:
+  ruby:
+    parameters:
+      ruby_version:
+        type: enum
+        enum: ['2.4.5', '2.5.5', '2.6.2']
     working_directory: ~/repo
     docker:
-      - image: circleci/ruby:2.5.5-node-browsers
+      - image: circleci/ruby:<< parameters.ruby_version >>-node-browsers
       - image: circleci/postgres:11.2-alpine-postgis-ram
 
-jobs:
-  test:
-    executor: ruby_2_5
-    parallelism: 1
+commands:
+  rspec:
     steps:
-      - checkout
-      - ruby-orbs/bundle-install
-      # run tests!
       - run:
           name: run tests
           command: |
@@ -31,7 +30,11 @@ jobs:
               --out /tmp/test-results/rspec.xml \
               --format progress \
               $TEST_FILES
-
+  run_test:
+    steps:
+      - checkout
+      - ruby-orbs/bundle-install
+      - rspec
       # collect reports
       - store_test_results:
           path: /tmp/test-results
@@ -39,7 +42,25 @@ jobs:
           path: /tmp/test-results
           destination: test-results
 
+jobs:
+  test:
+    parameters:
+      ruby_version:
+        type: enum
+        enum: ['2.4.5', '2.5.5', '2.6.2']
+    executor:
+      name: ruby
+      ruby_version: << parameters.ruby_version >>
+    parallelism: 1
+    steps:
+      - run_test
+
 workflows:
   build:
     jobs:
-      - test
+      - test:
+          ruby_version:  '2.4.5'
+      - test:
+          ruby_version:  '2.5.5'
+      - test:
+          ruby_version:  '2.6.2'
