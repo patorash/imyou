@@ -1,8 +1,5 @@
 version: 2.1
 
-orbs:
-  ruby-orbs: sue445/ruby-orbs@1.4.3
-
 executors:
   ruby:
     parameters:
@@ -37,12 +34,11 @@ commands:
         enum: ['4.2', '5.0', '5.1', '5.2']
     steps:
       - checkout
-      - run: export BUNDLE_GEMFILE=$PWD/gemfiles/rails_<< parameters.rails_version >>.gemfile
-      - ruby-orbs/bundle-install:
-          bundle_gemfile: gemfiles/rails_<< parameters.rails_version >>.gemfile
-          cache_key_prefix: v1-bundle-<< parameters.rails_version >>
-          gemspec_name: imyou
-          with_gemfile_lock: false
+      - run:
+          name: bundle install
+          command: |
+            export BUNDLE_GEMFILE=$PWD/gemfiles/rails_<< parameters.rails_version >>.gemfile
+            bundle install --jobs=4 --retry=3
       - rspec
       # collect reports
       - store_test_results:
