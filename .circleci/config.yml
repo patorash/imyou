@@ -39,6 +39,7 @@ commands:
       - checkout
       - run: export BUNDLE_GEMFILE=$PWD/gemfiles/rails_<< parameters.rails_version >>.gemfile
       - ruby-orbs/bundle-install:
+          bundle_gemfile: gemfiles/rails_<< parameters.rails_version >>.gemfile
           cache_key_prefix: v1-bundle-<< parameters.rails_version >>
           gemspec_name: imyou
           with_gemfile_lock: false
