@@ -31,9 +31,17 @@ commands:
               --format progress \
               $TEST_FILES
   run_test:
+    parameters:
+      rails_version:
+        type: enum
+        enum: ['4.2', '5.0', '5.1', '5.2']
     steps:
       - checkout
-      - ruby-orbs/bundle-install
+      - run: export BUNDLE_GEMFILE=$PWD/gemfiles/rails_<< parameters.rails_version >>.gemfile
+      - ruby-orbs/bundle-install:
+          cache_key_prefix: v1-bundle-<< parameters.rails_version >>
+          gemspec_name: imyou
+          with_gemfile_lock: false
       - rspec
       # collect reports
       - store_test_results:
@@ -48,19 +56,35 @@ jobs:
       ruby_version:
         type: enum
         enum: ['2.4.5', '2.5.5', '2.6.2']
+      rails_version:
+        type: enum
+        enum: ['4.2', '5.0', '5.1', '5.2']
     executor:
       name: ruby
       ruby_version: << parameters.ruby_version >>
     parallelism: 1
     steps:
-      - run_test
+      - run_test:
+          rails_version: << parameters.rails_version >>
 
 workflows:
   build:
     jobs:
       - test:
           ruby_version:  '2.4.5'
+          rails_version: '4.2'
+#      - test:
+#          ruby_version:  '2.5.5'
+#          rails_version: '4.2'
+#      - test:
+#          ruby_version:  '2.6.2'
+#          rails_version: '4.2'
       - test:
-          ruby_version:  '2.5.5'
-      - test:
-          ruby_version:  '2.6.2'
+          ruby_version:  '2.4.5'
+          rails_version: '5.0'
+#      - test:
+#          ruby_version:  '2.5.5'
+#          rails_version: '5.0'
+#      - test:
+#          ruby_version:  '2.6.2'
+#          rails_version: '5.0'
