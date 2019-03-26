@@ -1,0 +1,45 @@
+version: 2.1
+
+orbs:
+  ruby-orbs: sue445/ruby-orbs@1.4.3
+
+executors:
+  ruby_2_5:
+    working_directory: ~/repo
+    docker:
+      - image: circleci/ruby:2.5.5-node-browsers
+      - image: circleci/postgres:11.2-alpine-postgis-ram
+
+jobs:
+  test:
+    executor: ruby_2_5
+    parallelism: 1
+    steps:
+      - checkout
+      - ruby-orbs/bundle-install
+      # run tests!
+      - run:
+          name: run tests
+          command: |
+            mkdir /tmp/test-results
+            TEST_FILES="$(circleci tests glob "spec/**/*_spec.rb" | \
+              circleci tests split --split-by=timings)"
+
+            bundle exec rspec \
+              --format progress \
+              --format RspecJunitFormatter \
+              --out /tmp/test-results/rspec.xml \
+              --format progress \
+              $TEST_FILES
+
+      # collect reports
+      - store_test_results:
+          path: /tmp/test-results
+      - store_artifacts:
+          path: /tmp/test-results
+          destination: test-results
+
+workflows:
+  build:
+    jobs:
+      - test
