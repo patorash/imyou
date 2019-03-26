@@ -34,11 +34,20 @@ commands:
         enum: ['4.2', '5.0', '5.1', '5.2']
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - v1-bundle-<< parameters.rails_version >>
+            - v1-bundle-
       - run:
           name: bundle install
           command: |
             export BUNDLE_GEMFILE=$PWD/gemfiles/rails_<< parameters.rails_version >>.gemfile
-            bundle install --jobs=4 --retry=3
+            bundle check || bundle install --jobs=4 --retry=3 --path vendor/bundle
+      - save_cache:
+          key: v1-bundle-<< parameters.rails_version >>
+          paths:
+            - vendor/bundle
+
       - rspec
       # collect reports
       - store_test_results:
@@ -70,18 +79,36 @@ workflows:
       - test:
           ruby_version:  '2.4.5'
           rails_version: '4.2'
-#      - test:
-#          ruby_version:  '2.5.5'
-#          rails_version: '4.2'
-#      - test:
-#          ruby_version:  '2.6.2'
-#          rails_version: '4.2'
+      - test:
+          ruby_version:  '2.5.5'
+          rails_version: '4.2'
+      - test:
+          ruby_version:  '2.6.2'
+          rails_version: '4.2'
       - test:
           ruby_version:  '2.4.5'
           rails_version: '5.0'
-#      - test:
-#          ruby_version:  '2.5.5'
-#          rails_version: '5.0'
-#      - test:
-#          ruby_version:  '2.6.2'
-#          rails_version: '5.0'
+      - test:
+          ruby_version:  '2.5.5'
+          rails_version: '5.0'
+      - test:
+          ruby_version:  '2.6.2'
+          rails_version: '5.0'
+      - test:
+          ruby_version:  '2.4.5'
+          rails_version: '5.1'
+      - test:
+          ruby_version:  '2.5.5'
+          rails_version: '5.1'
+      - test:
+          ruby_version:  '2.6.2'
+          rails_version: '5.1'
+      - test:
+          ruby_version:  '2.4.5'
+          rails_version: '5.2'
+      - test:
+          ruby_version:  '2.5.5'
+          rails_version: '5.2'
+      - test:
+          ruby_version:  '2.6.2'
+          rails_version: '5.2'
