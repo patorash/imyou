@@ -1,0 +1,105 @@
+version: 2.1
+
+executors:
+  ruby:
+    parameters:
+      ruby_version:
+        type: enum
+        enum: ['2.4.5', '2.5.5', '2.6.2']
+    working_directory: ~/repo
+    docker:
+      - image: circleci/ruby:<< parameters.ruby_version >>-node-browsers
+      - image: circleci/postgres:11.2-alpine-postgis-ram
+
+commands:
+  rspec:
+    steps:
+      - run:
+          name: run tests
+          command: |
+            mkdir /tmp/test-results
+            TEST_FILES="$(circleci tests glob "spec/**/*_spec.rb" | \
+              circleci tests split --split-by=timings)"
+
+            bundle exec rspec \
+              --format progress \
+              --format RspecJunitFormatter \
+              --out /tmp/test-results/rspec.xml \
+              --format progress \
+              $TEST_FILES
+  run_test:
+    parameters:
+      rails_version:
+        type: enum
+        enum: ['4.2', '5.0', '5.1', '5.2']
+    steps:
+      - checkout
+      - run:
+          name: bundle install
+          command: |
+            export BUNDLE_GEMFILE=$PWD/gemfiles/rails_<< parameters.rails_version >>.gemfile
+            bundle check || bundle install --jobs=4 --retry=3
+      - rspec
+      # collect reports
+      - store_test_results:
+          path: /tmp/test-results
+      - store_artifacts:
+          path: /tmp/test-results
+          destination: test-results
+
+jobs:
+  test:
+    parameters:
+      ruby_version:
+        type: enum
+        enum: ['2.4.5', '2.5.5', '2.6.2']
+      rails_version:
+        type: enum
+        enum: ['4.2', '5.0', '5.1', '5.2']
+    executor:
+      name: ruby
+      ruby_version: << parameters.ruby_version >>
+    parallelism: 1
+    steps:
+      - run_test:
+          rails_version: << parameters.rails_version >>
+
+workflows:
+  build:
+    jobs:
+      - test:
+          ruby_version:  '2.4.5'
+          rails_version: '4.2'
+      - test:
+          ruby_version:  '2.5.5'
+          rails_version: '4.2'
+      - test:
+          ruby_version:  '2.6.2'
+          rails_version: '4.2'
+      - test:
+          ruby_version:  '2.4.5'
+          rails_version: '5.0'
+      - test:
+          ruby_version:  '2.5.5'
+          rails_version: '5.0'
+      - test:
+          ruby_version:  '2.6.2'
+          rails_version: '5.0'
+      - test:
+          ruby_version:  '2.4.5'
+          rails_version: '5.1'
+      - test:
+          ruby_version:  '2.5.5'
+          rails_version: '5.1'
+      - test:
+          ruby_version:  '2.6.2'
+          rails_version: '5.1'
+      - test:
+          ruby_version:  '2.4.5'
+          rails_version: '5.2'
+      - test:
+          ruby_version:  '2.5.5'
+          rails_version: '5.2'
+      - test:
+          ruby_version:  '2.6.2'
+          rails_version: '5.2'

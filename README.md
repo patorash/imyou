@@ -1,6 +1,6 @@
 # Imyou
 
-[![Build Status](https://travis-ci.org/patorash/imyou.svg?branch=master)](https://travis-ci.org/patorash/imyou)
+[![CircleCI](https://circleci.com/gh/patorash/imyou.svg?style=svg)](https://circleci.com/gh/patorash/imyou)
 
 Imyou has feature of attaching popular name to ActiveRecord model.
 
