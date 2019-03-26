@@ -34,20 +34,11 @@ commands:
         enum: ['4.2', '5.0', '5.1', '5.2']
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - v1-bundle-<< parameters.rails_version >>
-            - v1-bundle-
       - run:
           name: bundle install
           command: |
             export BUNDLE_GEMFILE=$PWD/gemfiles/rails_<< parameters.rails_version >>.gemfile
-            bundle check || bundle install --jobs=4 --retry=3 --path vendor/bundle
-      - save_cache:
-          key: v1-bundle-<< parameters.rails_version >>
-          paths:
-            - vendor/bundle
-
+            bundle check || bundle install --jobs=4 --retry=3
       - rspec
       # collect reports
       - store_test_results:
