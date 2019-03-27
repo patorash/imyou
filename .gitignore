@@ -12,4 +12,3 @@
 .ruby-version
 Gemfile.lock
 .circleci/config.processed.yml
-.circleci/config.update.yml

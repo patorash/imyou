@@ -74,7 +74,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - "05:6b:f3:ea:95:ed:cd:62:27:32:76:b5:1e:53:2f:77"
+            - "e7:e8:17:c5:03:05:fd:0c:0e:9b:3b:d3:90:53:c6:5c"
       - run:
           name: bundle install
           command: bundle check || bundle install --jobs=4 --retry=3
@@ -89,12 +89,19 @@ jobs:
           command: |
             git config push.default current
             git config user.email "chariderpato@gmail.com"
-            git config user.name "CircleCI"
+            git config user.name "patorash"
       - run:
           name: rake release
           command: |
-            bundle exec rake build
-            bundle exec rake release
+            gem list --prerelease --all --remote imyou \
+              | grep -E "^imyou" \
+              | sed -e "s/^.*(\(.*\)).*\$/\1/" \
+              | grep -q -v "`bundle exec ruby -e "print Imyou::VERSION"`"
+            result=$?
+            if [ $result = 0 ]; then
+              bundle exec rake build
+              bundle exec rake release
+            fi
       - run:
           name: Delete credentials
           command: |
@@ -165,6 +172,6 @@ workflows:
             - 'Ruby 2.4.5-Rails 5.2'
             - 'Ruby 2.5.5-Rails 5.2'
             - 'Ruby 2.6.2-Rails 5.2'
-#          filters:
-#            branches:
-#              only: master
+          filters:
+            branches:
+              only: master
