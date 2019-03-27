@@ -4,6 +4,7 @@ executors:
   ruby:
     parameters:
       ruby_version:
+        default: '2.6.2'
         type: enum
         enum: ['2.4.5', '2.5.5', '2.6.2']
     working_directory: ~/repo
@@ -30,6 +31,7 @@ commands:
   run_test:
     parameters:
       rails_version:
+        default: '5.2'
         type: enum
         enum: ['4.2', '5.0', '5.1', '5.2']
     steps:
@@ -64,54 +66,105 @@ jobs:
       - run_test:
           rails_version: << parameters.rails_version >>
 
+  release:
+    executor:
+      name: ruby
+    parallelism: 1
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "05:6b:f3:ea:95:ed:cd:62:27:32:76:b5:1e:53:2f:77"
+      - run:
+          name: bundle install
+          command: bundle check || bundle install --jobs=4 --retry=3
+      - run:
+          name: RubyGems.org | Set credential
+          command: |
+            mkdir -p ~/.gem
+            echo ":rubygems_api_key: $RUBYGEMS_API_KEY" > ~/.gem/credentials
+            chmod 0600 ~/.gem/credentials
+      - run:
+          name: Setup git
+          command: |
+            git config push.default current
+            git config user.email "chariderpato@gmail.com"
+            git config user.name "CircleCI"
+      - run:
+          name: rake release
+          command: |
+            bundle exec rake build
+            bundle exec rake release
+      - run:
+          name: Delete credentials
+          command: |
+            shred -u ~/.gem/credentials
+
 workflows:
   build:
     jobs:
       - test:
-          name: Ruby 2.4.5-Rails 4.2
+          name: 'Ruby 2.4.5-Rails 4.2'
           ruby_version:  '2.4.5'
           rails_version: '4.2'
       - test:
-          name: Ruby 2.5.5-Rails 4.2
+          name: 'Ruby 2.5.5-Rails 4.2'
           ruby_version:  '2.5.5'
           rails_version: '4.2'
       - test:
-          name: Ruby 2.6.2-Rails 4.2
+          name: 'Ruby 2.6.2-Rails 4.2'
           ruby_version:  '2.6.2'
           rails_version: '4.2'
       - test:
-          name: Ruby 2.4.5-Rails 5.0
+          name: 'Ruby 2.4.5-Rails 5.0'
           ruby_version:  '2.4.5'
           rails_version: '5.0'
       - test:
-          name: Ruby 2.5.5-Rails 5.0
+          name: 'Ruby 2.5.5-Rails 5.0'
           ruby_version:  '2.5.5'
           rails_version: '5.0'
       - test:
-          name: Ruby 2.6.2-Rails 5.0
+          name: 'Ruby 2.6.2-Rails 5.0'
           ruby_version:  '2.6.2'
           rails_version: '5.0'
       - test:
-          name: Ruby 2.4.5-Rails 5.1
+          name: 'Ruby 2.4.5-Rails 5.1'
           ruby_version:  '2.4.5'
           rails_version: '5.1'
       - test:
-          name: Ruby 2.5.5-Rails 5.1
+          name: 'Ruby 2.5.5-Rails 5.1'
           ruby_version:  '2.5.5'
           rails_version: '5.1'
       - test:
-          name: Ruby 2.6.2-Rails 5.1
+          name: 'Ruby 2.6.2-Rails 5.1'
           ruby_version:  '2.6.2'
           rails_version: '5.1'
       - test:
-          name: Ruby 2.4.5-Rails 5.2
+          name: 'Ruby 2.4.5-Rails 5.2'
           ruby_version:  '2.4.5'
           rails_version: '5.2'
       - test:
-          name: Ruby 2.5.5-Rails 5.2
+          name: 'Ruby 2.5.5-Rails 5.2'
           ruby_version:  '2.5.5'
           rails_version: '5.2'
       - test:
-          name: Ruby 2.6.2-Rails 5.2
+          name: 'Ruby 2.6.2-Rails 5.2'
           ruby_version:  '2.6.2'
           rails_version: '5.2'
+      - release:
+          requires:
+            - 'Ruby 2.4.5-Rails 4.2'
+            - 'Ruby 2.5.5-Rails 4.2'
+            - 'Ruby 2.6.2-Rails 4.2'
+            - 'Ruby 2.4.5-Rails 5.0'
+            - 'Ruby 2.5.5-Rails 5.0'
+            - 'Ruby 2.6.2-Rails 5.0'
+            - 'Ruby 2.4.5-Rails 5.1'
+            - 'Ruby 2.5.5-Rails 5.1'
+            - 'Ruby 2.6.2-Rails 5.1'
+            - 'Ruby 2.4.5-Rails 5.2'
+            - 'Ruby 2.5.5-Rails 5.2'
+            - 'Ruby 2.6.2-Rails 5.2'
+#          filters:
+#            branches:
+#              only: master
