@@ -93,6 +93,7 @@ jobs:
       - run:
           name: rake release
           command: |
+            set +e
             filename=$(for n in *; do printf '%s\n' "$n"; done | grep gemspec)
             gem_name=`ruby -e "require 'rubygems'; spec = Gem::Specification::load('${filename}'); puts spec.name"`
             gem_version=`ruby -e "require 'rubygems'; spec = Gem::Specification::load('${filename}'); puts spec.version"`
@@ -105,7 +106,6 @@ jobs:
               bundle exec rake build
               bundle exec rake release
             fi
-            exit 0
       - run:
           name: Delete credentials
           command: |
