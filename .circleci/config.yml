@@ -93,10 +93,13 @@ jobs:
       - run:
           name: rake release
           command: |
-            gem list --prerelease --all --remote imyou \
-              | grep -E "^imyou" \
+            filename=$(for n in *; do printf '%s\n' "$n"; done | grep gemspec)
+            gem_name=`ruby -e "require 'rubygems'; spec = Gem::Specification::load('${filename}'); puts spec.name"`
+            gem_version=`ruby -e "require 'rubygems'; spec = Gem::Specification::load('${filename}'); puts spec.version"`
+            gem list --prerelease --all --remote $gem_name \
+              | grep -E "^${gem_name}" \
               | sed -e "s/^.*(\(.*\)).*\$/\1/" \
-              | grep -q -v "`bundle exec ruby -e "print Imyou::VERSION"`"
+              | grep -q -v $gem_version
             result=$?
             if [ $result = 0 ]; then
               bundle exec rake build
