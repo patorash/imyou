@@ -81,6 +81,9 @@ module Imyou
           records
         end
 
+        alias_method :save_with_nicknames, :save
+        alias_method :save_with_nicknames!, :save!
+
         def self.has_imyou?
           true
         end
