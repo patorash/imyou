@@ -8,7 +8,7 @@ Imyou mean nickname in japanease.
 
 ## Installation
 
-### Rails 4.x and 5.x
+### Rails 4.x, 5.x and 6.x
 
 Add this line to your application's Gemfile:
 
