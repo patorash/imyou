@@ -11,11 +11,13 @@ ActiveRecord::Schema.define do
             name: 'imyou_unique_name'
 
   create_table :users, force: true do |t|
-    t.string :name
+    t.string :name, null: false
+    t.timestamps null: false
   end
 
   create_table :not_users, force: true do |t|
-    t.string :name
+    t.string :name, null: false
+    t.timestamps null: false
   end
 
   create_table :no_name_users, force: true do |t|

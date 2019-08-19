@@ -4,6 +4,7 @@ RSpec.describe Imyou::Nickname do
   let(:user) { User.create!(name: 'user_name') }
   let(:no_name_user) { NoNameUser.create! }
   let(:new_user) { User.new(name: 'new_user_name') }
+  let(:invalid_user) { User.new(name: '') }
 
   it 'should not have imyou' do
     expect(NotUser).not_to have_imyou
@@ -105,23 +106,38 @@ RSpec.describe Imyou::Nickname do
       context 'If user is new_record,' do
         it 'build new nicknames' do
           new_user.nicknames = %w(foo hoge bar)
-          expect(new_user.save).to be true
+          expect(new_user.save_with_nicknames).to be true
           expect(new_user.imyou_nicknames.all?(&:persisted?)).to be true
           expect(new_user.nicknames).to match_array %w(foo hoge bar)
         end
 
         it 'can remove nicknames' do
           new_user.nicknames = []
-          expect(new_user.save).to be true
+          expect(new_user.save_with_nicknames).to be true
           expect(new_user.nicknames).to eq []
         end
 
         it 'can remove nicknames by nil' do
           new_user.nicknames = nil
-          expect(new_user.save).to be true
+          expect(new_user.save_with_nicknames).to be true
           expect(new_user.nicknames).to eq []
         end
+      end
 
+      context 'If user is invalid,' do
+        it 'cannot save' do
+          invalid_user.nicknames = %w(foo hoge bar)
+          expect(invalid_user.save_with_nicknames).to be false
+          expect(invalid_user.imyou_nicknames.all?(&:new_record?)).to be true
+          expect(invalid_user.nicknames).to match_array %w(foo hoge bar)
+        end
+
+        it 'cannot save!' do
+          invalid_user.nicknames = %w(foo hoge bar)
+          expect {
+            invalid_user.save_with_nicknames!
+          }.to raise_error ActiveRecord::RecordInvalid
+        end
       end
     end
 
