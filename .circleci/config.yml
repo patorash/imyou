@@ -4,9 +4,9 @@ executors:
   ruby:
     parameters:
       ruby_version:
-        default: '2.6.3'
+        default: '2.7.1'
         type: enum
-        enum: ['2.4.6', '2.5.5', '2.6.3']
+        enum: ['2.5.8', '2.6.6', '2.7.1']
     working_directory: ~/repo
     docker:
       - image: circleci/ruby:<< parameters.ruby_version >>-node-browsers
@@ -31,11 +31,12 @@ commands:
   run_test:
     parameters:
       rails_version:
-        default: '5.2'
+        default: '6.0'
         type: enum
-        enum: ['4.2', '5.0', '5.1', '5.2', '6.0']
+        enum: ['5.0', '5.1', '5.2', '6.0']
     steps:
       - checkout
+      - run: gem install bundler --version=2.1.4 -N
       - run:
           name: bundle install
           command: |
@@ -54,10 +55,10 @@ jobs:
     parameters:
       ruby_version:
         type: enum
-        enum: ['2.4.6', '2.5.5', '2.6.3']
+        enum: ['2.5.8', '2.6.6', '2.7.1']
       rails_version:
         type: enum
-        enum: ['4.2', '5.0', '5.1', '5.2', '6.0']
+        enum: ['5.0', '5.1', '5.2', '6.0']
     executor:
       name: ruby
       ruby_version: << parameters.ruby_version >>
@@ -75,6 +76,7 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - "e7:e8:17:c5:03:05:fd:0c:0e:9b:3b:d3:90:53:c6:5c"
+      - run: gem install bundler --version=2.1.4 -N
       - run:
           name: bundle install
           command: bundle check || bundle install --jobs=4 --retry=3
@@ -115,77 +117,67 @@ workflows:
   build:
     jobs:
       - test:
-          name: 'Ruby 2.4.6-Rails 4.2'
-          ruby_version:  '2.4.6'
-          rails_version: '4.2'
-      - test:
-          name: 'Ruby 2.5.5-Rails 4.2'
-          ruby_version:  '2.5.5'
-          rails_version: '4.2'
-      - test:
-          name: 'Ruby 2.6.3-Rails 4.2'
-          ruby_version:  '2.6.3'
-          rails_version: '4.2'
-      - test:
-          name: 'Ruby 2.4.6-Rails 5.0'
-          ruby_version:  '2.4.6'
+          name: 'Ruby 2.5.8-Rails 5.0'
+          ruby_version:  '2.5.8'
           rails_version: '5.0'
       - test:
-          name: 'Ruby 2.5.5-Rails 5.0'
-          ruby_version:  '2.5.5'
+          name: 'Ruby 2.6.6-Rails 5.0'
+          ruby_version:  '2.6.6'
           rails_version: '5.0'
       - test:
-          name: 'Ruby 2.6.3-Rails 5.0'
-          ruby_version:  '2.6.3'
+          name: 'Ruby 2.7.1-Rails 5.0'
+          ruby_version:  '2.7.1'
           rails_version: '5.0'
       - test:
-          name: 'Ruby 2.4.6-Rails 5.1'
-          ruby_version:  '2.4.6'
+          name: 'Ruby 2.5.8-Rails 5.1'
+          ruby_version:  '2.5.8'
           rails_version: '5.1'
       - test:
-          name: 'Ruby 2.5.5-Rails 5.1'
-          ruby_version:  '2.5.5'
+          name: 'Ruby 2.6.6-Rails 5.1'
+          ruby_version:  '2.6.6'
           rails_version: '5.1'
       - test:
-          name: 'Ruby 2.6.3-Rails 5.1'
-          ruby_version:  '2.6.3'
+          name: 'Ruby 2.7.1-Rails 5.1'
+          ruby_version:  '2.7.1'
           rails_version: '5.1'
       - test:
-          name: 'Ruby 2.4.6-Rails 5.2'
-          ruby_version:  '2.4.6'
+          name: 'Ruby 2.5.8-Rails 5.2'
+          ruby_version:  '2.5.8'
           rails_version: '5.2'
       - test:
-          name: 'Ruby 2.5.5-Rails 5.2'
-          ruby_version:  '2.5.5'
+          name: 'Ruby 2.6.6-Rails 5.2'
+          ruby_version:  '2.6.6'
           rails_version: '5.2'
       - test:
-          name: 'Ruby 2.6.3-Rails 5.2'
-          ruby_version:  '2.6.3'
+          name: 'Ruby 2.7.1-Rails 5.2'
+          ruby_version:  '2.7.1'
           rails_version: '5.2'
       - test:
-          name: 'Ruby 2.5.5-Rails 6.0'
-          ruby_version:  '2.5.5'
+          name: 'Ruby 2.5.8-Rails 6.0'
+          ruby_version:  '2.5.8'
           rails_version: '6.0'
       - test:
-          name: 'Ruby 2.6.3-Rails 6.0'
-          ruby_version:  '2.6.3'
+          name: 'Ruby 2.6.6-Rails 6.0'
+          ruby_version:  '2.6.6'
+          rails_version: '6.0'
+      - test:
+          name: 'Ruby 2.7.1-Rails 6.0'
+          ruby_version:  '2.7.1'
           rails_version: '6.0'
       - release:
           requires:
-            - 'Ruby 2.4.6-Rails 4.2'
-            - 'Ruby 2.5.5-Rails 4.2'
-            - 'Ruby 2.6.3-Rails 4.2'
-            - 'Ruby 2.4.6-Rails 5.0'
-            - 'Ruby 2.5.5-Rails 5.0'
-            - 'Ruby 2.6.3-Rails 5.0'
-            - 'Ruby 2.4.6-Rails 5.1'
-            - 'Ruby 2.5.5-Rails 5.1'
-            - 'Ruby 2.6.3-Rails 5.1'
-            - 'Ruby 2.4.6-Rails 5.2'
-            - 'Ruby 2.5.5-Rails 5.2'
-            - 'Ruby 2.6.3-Rails 5.2'
-            - 'Ruby 2.5.5-Rails 6.0'
-            - 'Ruby 2.6.3-Rails 6.0'
+            - 'Ruby 2.5.8-Rails 5.0'
+            - 'Ruby 2.6.6-Rails 5.0'
+            - 'Ruby 2.7.1-Rails 5.0'
+            - 'Ruby 2.5.8-Rails 5.1'
+            - 'Ruby 2.6.6-Rails 5.1'
+            - 'Ruby 2.7.1-Rails 5.1'
+            - 'Ruby 2.5.8-Rails 5.2'
+            - 'Ruby 2.6.6-Rails 5.2'
+            - 'Ruby 2.7.1-Rails 5.2'
+            - 'Ruby 2.5.8-Rails 6.0'
+            - 'Ruby 2.6.6-Rails 6.0'
+            - 'Ruby 2.7.1-Rails 6.0'
           filters:
             branches:
               only: master
