@@ -36,6 +36,7 @@ commands:
         enum: ['5.0', '5.1', '5.2', '6.0']
     steps:
       - checkout
+      - run: gem install bundler --version=2.1.4 -N
       - run:
           name: bundle install
           command: |
@@ -75,6 +76,7 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - "e7:e8:17:c5:03:05:fd:0c:0e:9b:3b:d3:90:53:c6:5c"
+      - run: gem install bundler --version=2.1.4 -N
       - run:
           name: bundle install
           command: bundle check || bundle install --jobs=4 --retry=3
