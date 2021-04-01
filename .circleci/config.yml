@@ -4,7 +4,7 @@ executors:
   ruby:
     parameters:
       ruby_version:
-        default: '2.7.1'
+        default: '2.7.2'
         type: enum
         enum: ['2.5.8', '2.6.6', '2.7.2', '3.0.0']
     working_directory: ~/repo
