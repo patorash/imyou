@@ -75,7 +75,6 @@ RSpec.describe Imyou::Nickname do
 
       it 'should search by users.name' do
         expect(User.partial_match_by_nickname('user')).to be_exists
-        p User.partial_match_by_nickname('er_na').to_sql
         expect(User.partial_match_by_nickname('er_na')).to be_exists
       end
 
