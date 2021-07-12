@@ -49,10 +49,10 @@ module Imyou
 
         scope :partial_match_by_nickname, ->(nickname, with_name_column: true) do
           if Gem::Version.new(ActiveRecord.version) >= Gem::Version.new(5)
-            records = self.left_outer_joins(:imyou_nicknames).where(Imyou::Nickname.arel_table[:name].matches("%#{sanitize_sql_like(nickname)}%"))
+            records = self.left_outer_joins(:imyou_nicknames).where(Imyou::Nickname.arel_table[:name].matches("%#{sanitize_sql_like(nickname)}%", '\\'))
             unless name_column.nil? || with_name_column == false
               records.or!(self.left_outer_joins(:imyou_nicknames).where(
-                  self.arel_table[name_column].matches("%#{sanitize_sql_like(nickname)}%"))
+                  self.arel_table[name_column].matches("%#{sanitize_sql_like(nickname)}%", '\\'))
               )
             end
           else
@@ -67,13 +67,13 @@ module Imyou
             arel_nickname_column = Imyou::Nickname.arel_table[:name]
             records = if name_column.nil? || with_name_column == false
                         joined_records.where(
-                            arel_nickname_column.matches("%#{sanitize_sql_like(nickname)}%")
+                            arel_nickname_column.matches("%#{sanitize_sql_like(nickname)}%", '\\')
                         )
                       else
                         arel_name_column = self.arel_table[name_column]
                         joined_records.where(
-                            arel_nickname_column.matches("%#{sanitize_sql_like(nickname)}%").or(
-                                arel_name_column.matches("%#{sanitize_sql_like(nickname)}%")
+                            arel_nickname_column.matches("%#{sanitize_sql_like(nickname)}%", '\\').or(
+                                arel_name_column.matches("%#{sanitize_sql_like(nickname)}%", '\\')
                             )
                         )
                       end

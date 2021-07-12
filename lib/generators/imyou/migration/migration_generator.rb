@@ -29,13 +29,13 @@ module Imyou
     end
 
     def migration_version
-      if rails5?
+      if over_rails5?
         "[#{Rails::VERSION::MAJOR}.#{Rails::VERSION::MINOR}]"
       end
     end
 
-    def rails5?
-      Rails.version.start_with? '5'
+    def over_rails5?
+      Rails::VERSION::MAJOR >= 5
     end
   end
 end
