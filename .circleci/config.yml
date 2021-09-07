@@ -128,10 +128,6 @@ workflows:
           ruby_version:  '2.7.4'
           rails_version: '5.0'
       - test:
-          name: 'Ruby 3.0.2-Rails 5.0'
-          ruby_version:  '3.0.2'
-          rails_version: '5.0'
-      - test:
           name: 'Ruby 2.5.9-Rails 5.1'
           ruby_version:  '2.5.9'
           rails_version: '5.1'
@@ -144,10 +140,6 @@ workflows:
           ruby_version:  '2.7.4'
           rails_version: '5.1'
       - test:
-          name: 'Ruby 3.0.2-Rails 5.1'
-          ruby_version:  '3.0.2'
-          rails_version: '5.1'
-      - test:
           name: 'Ruby 2.5.9-Rails 5.2'
           ruby_version:  '2.5.9'
           rails_version: '5.2'
@@ -158,10 +150,6 @@ workflows:
       - test:
           name: 'Ruby 2.7.4-Rails 5.2'
           ruby_version:  '2.7.4'
-          rails_version: '5.2'
-      - test:
-          name: 'Ruby 3.0.2-Rails 5.2'
-          ruby_version:  '3.0.2'
           rails_version: '5.2'
       - test:
           name: 'Ruby 2.5.9-Rails 6.0'
@@ -202,15 +190,12 @@ workflows:
             - 'Ruby 2.5.9-Rails 5.0'
             - 'Ruby 2.6.8-Rails 5.0'
             - 'Ruby 2.7.4-Rails 5.0'
-            - 'Ruby 3.0.2-Rails 5.0'
             - 'Ruby 2.5.9-Rails 5.1'
             - 'Ruby 2.6.8-Rails 5.1'
             - 'Ruby 2.7.4-Rails 5.1'
-            - 'Ruby 3.0.2-Rails 5.1'
             - 'Ruby 2.5.9-Rails 5.2'
             - 'Ruby 2.6.8-Rails 5.2'
             - 'Ruby 2.7.4-Rails 5.2'
-            - 'Ruby 3.0.2-Rails 5.2'
             - 'Ruby 2.5.9-Rails 6.0'
             - 'Ruby 2.6.8-Rails 6.0'
             - 'Ruby 2.7.4-Rails 6.0'
