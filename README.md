@@ -1,14 +1,14 @@
 # Imyou
 
-[![CircleCI](https://circleci.com/gh/patorash/imyou.svg?style=svg)](https://circleci.com/gh/patorash/imyou)
+[![Test](https://github.com/patorash/imyou/actions/workflows/test.yml/badge.svg)](https://github.com/patorash/imyou/actions/workflows/test.yml)
 
 Imyou has feature of attaching popular name to ActiveRecord model.
 
-Imyou mean nickname in japanease.
+Imyou mean nickname in japanese.
 
 ## Installation
 
-### Rails 4.x, 5.x and 6.x
+### Rails 5.x, 6.x and 7.0.x
 
 Add this line to your application's Gemfile:
 
