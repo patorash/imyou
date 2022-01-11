@@ -114,10 +114,10 @@ module Imyou
               imyou_nickname.name == nickname
             end
             self.imyou_nicknames.replace(array)
-            true
           else
             self.imyou_nicknames.find_by(name: nickname)&.destroy!
           end
+          true
         end
 
         def nicknames=(new_nicknames)
