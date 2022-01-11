@@ -1,11 +1,8 @@
 require 'minitest/autorun'
-require 'active_support/testing/autorun'
-require 'active_support/testing/assertions'
 require 'active_record'
 
 require 'database_cleaner/active_record'
 require "imyou"
-require 'pry'
 
 Dir["#{Dir.pwd}/test/internal/app/models/*.rb"].each(&method(:require))
 
