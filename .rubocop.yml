@@ -1,0 +1,43 @@
+inherit_from: .rubocop_todo.yml
+
+require:
+  - rubocop-performance
+  - rubocop-rake
+  - rubocop-minitest
+
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 2.6
+  Exclude:
+    - 'lib/generators/imyou/migration/templates/active_record/migration.rb'
+
+Layout/LineLength:
+  AllowHeredoc: true
+  AllowURI: true
+
+Metrics/BlockLength:
+  IgnoredMethods:
+    - describe
+    - refine
+    - class_eval
+  Exclude:
+    - 'lib/imyou/models.rb'
+Layout/DotPosition:
+  EnforcedStyle: trailing
+
+Style/Documentation:
+  Enabled: false
+
+Naming/PredicateName:
+  AllowedMethods:
+    - has_imyou
+    - has_imyou?
+  Exclude:
+    - 'spec/**/*'
+
+Metrics/ModuleLength:
+  Enabled: false
+
+Metrics/MethodLength:
+  IgnoredMethods:
+    - has_imyou

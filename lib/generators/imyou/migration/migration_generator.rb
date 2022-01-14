@@ -1,37 +1,39 @@
+# frozen_string_literal: true
+
 require 'rails/generators/migration'
 
 module Imyou
   class MigrationGenerator < Rails::Generators::Base
     include Rails::Generators::Migration
 
-    desc "Generators migration for Imyou(imyous table)"
+    desc 'Generators migration for Imyou(imyous table)'
 
     def self.orm
       Rails::Generators.options[:rails][:orm]
     end
 
     def self.source_root
-      File.join(File.dirname(__FILE__), 'templates', (orm.to_s unless orm.class.eql?(String)))
+      File.join(File.dirname(__FILE__), 'templates', (orm.to_s unless orm.instance_of?(String)))
     end
 
     def self.orm_has_migration?
       [:active_record].include? orm
     end
 
-    def self.next_migration_number(path)
-      Time.now.utc.strftime("%Y%m%d%H%M%S")
+    def self.next_migration_number(_path)
+      Time.now.utc.strftime('%Y%m%d%H%M%S')
     end
 
     def create_migration_file
-      if self.class.orm_has_migration?
-        migration_template 'migration.rb', 'db/migrate/imyou_migration.rb', migration_version: migration_version
-      end
+      return unless self.class.orm_has_migration?
+
+      migration_template 'migration.rb',
+                         'db/migrate/imyou_migration.rb',
+                         migration_version: migration_version
     end
 
     def migration_version
-      if over_rails5?
-        "[#{Rails::VERSION::MAJOR}.#{Rails::VERSION::MINOR}]"
-      end
+      "[#{Rails::VERSION::MAJOR}.#{Rails::VERSION::MINOR}]" if over_rails5?
     end
 
     def over_rails5?

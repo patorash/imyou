@@ -1,4 +1,6 @@
-require "imyou/version"
+# frozen_string_literal: true
+
+require 'imyou/version'
 require 'active_record'
 require 'active_support/inflector'
 

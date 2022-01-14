@@ -1,13 +1,16 @@
+# frozen_string_literal: true
+
 module Imyou
   module Models
     def has_imyou?
       false
     end
 
-    def has_imyou(name_column=nil)
+    def has_imyou(name_column = nil)
       class_eval do
-
-        has_many :imyou_nicknames, -> { order(id: :asc) }, class_name: 'Imyou::Nickname', as: :model, dependent: :destroy
+        has_many :imyou_nicknames, lambda {
+                                     order(id: :asc)
+                                   }, class_name: 'Imyou::Nickname', as: :model, dependent: :destroy
 
         accepts_nested_attributes_for :imyou_nicknames,
                                       allow_destroy: true,
@@ -15,71 +18,71 @@ module Imyou
 
         scope :with_nicknames, -> { preload(:imyou_nicknames) }
 
-        scope :match_by_nickname, ->(nickname, with_name_column: true) do
+        scope :match_by_nickname, lambda { |nickname, with_name_column: true|
           if Gem::Version.new(ActiveRecord.version) >= Gem::Version.new(5)
-            records = self.left_outer_joins(:imyou_nicknames).where(Imyou::Nickname.arel_table[:name].eq(nickname))
+            records = left_outer_joins(:imyou_nicknames).where(Imyou::Nickname.arel_table[:name].eq(nickname))
             unless name_column.nil? || with_name_column == false
-              records.or!(self.left_outer_joins(:imyou_nicknames).where(name_column => nickname))
+              records.or!(left_outer_joins(:imyou_nicknames).where(name_column => nickname))
             end
           else
-            joined_records = self.joins(<<~SQL
+            joined_records = joins(<<~SQL)
               LEFT OUTER JOIN #{Imyou::Nickname.quoted_table_name}
               ON
-                #{Imyou::Nickname.quoted_table_name}.#{connection.quote_column_name(:model_id)} = #{self.quoted_table_name}.#{connection.quote_column_name(:id)}
+                #{Imyou::Nickname.quoted_table_name}.#{connection.quote_column_name(:model_id)} = #{quoted_table_name}.#{connection.quote_column_name(:id)}
                 AND
-                #{Imyou::Nickname.quoted_table_name}.#{connection.quote_column_name(:model_type)} = #{connection.quote(self.name)}
+                #{Imyou::Nickname.quoted_table_name}.#{connection.quote_column_name(:model_type)} = #{connection.quote(name)}
             SQL
-            )
             arel_nickname_column = Imyou::Nickname.arel_table[:name]
             records = if name_column.nil? || with_name_column == false
                         joined_records.where(
-                            arel_nickname_column.eq(nickname)
+                          arel_nickname_column.eq(nickname)
                         )
                       else
-                        arel_name_column = self.arel_table[name_column]
+                        arel_name_column = arel_table[name_column]
                         joined_records.where(
-                            arel_nickname_column.eq(nickname).or(
-                                arel_name_column.eq(nickname)
-                            )
+                          arel_nickname_column.eq(nickname).or(
+                            arel_name_column.eq(nickname)
+                          )
                         )
                       end
           end
           records
-        end
+        }
 
-        scope :partial_match_by_nickname, ->(nickname, with_name_column: true) do
+        scope :partial_match_by_nickname, lambda { |nickname, with_name_column: true|
           if Gem::Version.new(ActiveRecord.version) >= Gem::Version.new(5)
-            records = self.left_outer_joins(:imyou_nicknames).where(Imyou::Nickname.arel_table[:name].matches("%#{sanitize_sql_like(nickname)}%", '\\'))
+            records = left_outer_joins(:imyou_nicknames).
+                      where(Imyou::Nickname.arel_table[:name].
+                      matches("%#{sanitize_sql_like(nickname)}%", '\\'))
             unless name_column.nil? || with_name_column == false
-              records.or!(self.left_outer_joins(:imyou_nicknames).where(
-                  self.arel_table[name_column].matches("%#{sanitize_sql_like(nickname)}%", '\\'))
-              )
+              records.or!(left_outer_joins(:imyou_nicknames).where(
+                            arel_table[name_column].matches("%#{sanitize_sql_like(nickname)}%", '\\')
+                          ))
             end
           else
-            joined_records = self.joins(<<~SQL
+            joined_records = joins(<<~SQL)
               LEFT OUTER JOIN #{Imyou::Nickname.quoted_table_name}
               ON
-                #{Imyou::Nickname.quoted_table_name}.#{connection.quote_column_name(:model_id)} = #{self.quoted_table_name}.#{connection.quote_column_name(:id)}
+                #{Imyou::Nickname.quoted_table_name}.#{connection.quote_column_name(:model_id)} = #{quoted_table_name}.#{connection.quote_column_name(:id)}
                 AND
-                #{Imyou::Nickname.quoted_table_name}.#{connection.quote_column_name(:model_type)} = #{connection.quote(self.name)}
+                #{Imyou::Nickname.quoted_table_name}.#{connection.quote_column_name(:model_type)} = #{connection.quote(name)}
             SQL
-            )
             arel_nickname_column = Imyou::Nickname.arel_table[:name]
             records = if name_column.nil? || with_name_column == false
                         joined_records.where(
-                            arel_nickname_column.matches("%#{sanitize_sql_like(nickname)}%", '\\')
+                          arel_nickname_column.matches("%#{sanitize_sql_like(nickname)}%", '\\')
                         )
                       else
-                        arel_name_column = self.arel_table[name_column]
+                        arel_name_column = arel_table[name_column]
                         joined_records.where(
-                            arel_nickname_column.matches("%#{sanitize_sql_like(nickname)}%", '\\').or(
-                                arel_name_column.matches("%#{sanitize_sql_like(nickname)}%", '\\')
-                            )
+                          arel_nickname_column.matches("%#{sanitize_sql_like(nickname)}%", '\\').or(
+                            arel_name_column.matches("%#{sanitize_sql_like(nickname)}%", '\\')
+                          )
                         )
                       end
           end
           records
-        end
+        }
 
         alias_method :save_with_nicknames, :save
         alias_method :save_with_nicknames!, :save!
@@ -90,48 +93,44 @@ module Imyou
 
         def nicknames
           if new_record?
-            self.imyou_nicknames.map(&:name)
+            imyou_nicknames.map(&:name)
           else
-            self.imyou_nicknames.pluck(:name)
+            imyou_nicknames.pluck(:name)
           end
         end
 
         def remove_all_nicknames
-          self.imyou_nicknames.delete_all
+          imyou_nicknames.delete_all
         end
 
         def add_nickname(nickname)
           if new_record?
-            self.imyou_nicknames.build(name: nickname)
+            imyou_nicknames.build(name: nickname)
           else
-            self.imyou_nicknames.find_or_create_by(name: nickname)
+            imyou_nicknames.find_or_create_by(name: nickname)
           end
         end
 
         def remove_nickname(nickname)
           if new_record?
-            array = self.imyou_nicknames.to_a.delete_if do |imyou_nickname|
+            array = imyou_nicknames.to_a.delete_if do |imyou_nickname|
               imyou_nickname.name == nickname
             end
-            self.imyou_nicknames.replace(array)
+            imyou_nicknames.replace(array)
           else
-            self.imyou_nicknames.find_by(name: nickname)&.destroy!
+            imyou_nicknames.find_by(name: nickname)&.destroy!
           end
           true
         end
 
         def nicknames=(new_nicknames)
           if new_record?
-            new_nicknames&.each do |new_nickname|
-              self.imyou_nicknames.build(name: new_nickname)
-            end
+            new_nicknames&.each { |new_nickname| imyou_nicknames.build(name: new_nickname) }
           elsif new_nicknames.blank?
-              self.remove_all_nicknames
+            remove_all_nicknames
           else
-            self.imyou_nicknames.where.not(name: new_nicknames).delete_all
-            new_nicknames.each do |new_nickname|
-              self.imyou_nicknames.find_or_create_by(name: new_nickname)
-            end
+            imyou_nicknames.where.not(name: new_nicknames).delete_all
+            new_nicknames.each { |new_nickname| imyou_nicknames.find_or_create_by(name: new_nickname) }
           end
         end
       end
