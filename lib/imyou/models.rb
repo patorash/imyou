@@ -4,10 +4,11 @@ module Imyou
       false
     end
 
-    def has_imyou(name_column=nil)
+    def has_imyou(name_column = nil)
       class_eval do
-
-        has_many :imyou_nicknames, -> { order(id: :asc) }, class_name: 'Imyou::Nickname', as: :model, dependent: :destroy
+        has_many :imyou_nicknames, -> {
+                                     order(id: :asc)
+                                   }, class_name: 'Imyou::Nickname', as: :model, dependent: :destroy
 
         accepts_nested_attributes_for :imyou_nicknames,
                                       allow_destroy: true,
@@ -29,18 +30,18 @@ module Imyou
                 AND
                 #{Imyou::Nickname.quoted_table_name}.#{connection.quote_column_name(:model_type)} = #{connection.quote(self.name)}
             SQL
-            )
+                                       )
             arel_nickname_column = Imyou::Nickname.arel_table[:name]
             records = if name_column.nil? || with_name_column == false
                         joined_records.where(
-                            arel_nickname_column.eq(nickname)
+                          arel_nickname_column.eq(nickname)
                         )
                       else
                         arel_name_column = self.arel_table[name_column]
                         joined_records.where(
-                            arel_nickname_column.eq(nickname).or(
-                                arel_name_column.eq(nickname)
-                            )
+                          arel_nickname_column.eq(nickname).or(
+                            arel_name_column.eq(nickname)
+                          )
                         )
                       end
           end
@@ -52,8 +53,8 @@ module Imyou
             records = self.left_outer_joins(:imyou_nicknames).where(Imyou::Nickname.arel_table[:name].matches("%#{sanitize_sql_like(nickname)}%", '\\'))
             unless name_column.nil? || with_name_column == false
               records.or!(self.left_outer_joins(:imyou_nicknames).where(
-                  self.arel_table[name_column].matches("%#{sanitize_sql_like(nickname)}%", '\\'))
-              )
+                            self.arel_table[name_column].matches("%#{sanitize_sql_like(nickname)}%", '\\')
+                          ))
             end
           else
             joined_records = self.joins(<<~SQL
@@ -63,18 +64,18 @@ module Imyou
                 AND
                 #{Imyou::Nickname.quoted_table_name}.#{connection.quote_column_name(:model_type)} = #{connection.quote(self.name)}
             SQL
-            )
+                                       )
             arel_nickname_column = Imyou::Nickname.arel_table[:name]
             records = if name_column.nil? || with_name_column == false
                         joined_records.where(
-                            arel_nickname_column.matches("%#{sanitize_sql_like(nickname)}%", '\\')
+                          arel_nickname_column.matches("%#{sanitize_sql_like(nickname)}%", '\\')
                         )
                       else
                         arel_name_column = self.arel_table[name_column]
                         joined_records.where(
-                            arel_nickname_column.matches("%#{sanitize_sql_like(nickname)}%", '\\').or(
-                                arel_name_column.matches("%#{sanitize_sql_like(nickname)}%", '\\')
-                            )
+                          arel_nickname_column.matches("%#{sanitize_sql_like(nickname)}%", '\\').or(
+                            arel_name_column.matches("%#{sanitize_sql_like(nickname)}%", '\\')
+                          )
                         )
                       end
           end
@@ -126,7 +127,7 @@ module Imyou
               self.imyou_nicknames.build(name: new_nickname)
             end
           elsif new_nicknames.blank?
-              self.remove_all_nicknames
+            self.remove_all_nicknames
           else
             self.imyou_nicknames.where.not(name: new_nicknames).delete_all
             new_nicknames.each do |new_nickname|

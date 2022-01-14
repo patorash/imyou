@@ -15,7 +15,7 @@ ActiveRecord::Schema.define do
   end
   add_index :imyou_nicknames, :name
   add_index :imyou_nicknames,
-            [ :name, :model_id, :model_type ],
+            [:name, :model_id, :model_type],
             unique: true,
             name: 'imyou_unique_name'
 
@@ -36,7 +36,6 @@ end
 DatabaseCleaner.strategy = :transaction
 
 class Minitest::Spec
-
   before :each do
     DatabaseCleaner.start
   end

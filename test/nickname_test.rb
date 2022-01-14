@@ -194,11 +194,11 @@ describe Imyou::Nickname do
     describe 'accepts_nested_attributes_for' do
       it 'should register nicknames' do
         params = {
-            imyou_nicknames_attributes: [
-                { name: 'hoge' },
-                { name: 'piyo' },
-                { name: 'fuga' },
-            ]
+          imyou_nicknames_attributes: [
+            { name: 'hoge' },
+            { name: 'piyo' },
+            { name: 'fuga' },
+          ]
         }
         expect(user.nicknames.size).must_equal 3
         user.update(params)
@@ -208,10 +208,10 @@ describe Imyou::Nickname do
 
       it 'should destroy nicknames' do
         params = {
-            imyou_nicknames_attributes: [
-                { id: user.imyou_nicknames.first.id, _destroy: '1' },
-                { id: user.imyou_nicknames.second.id, _destroy: '1' }
-            ]
+          imyou_nicknames_attributes: [
+            { id: user.imyou_nicknames.first.id, _destroy: '1' },
+            { id: user.imyou_nicknames.second.id, _destroy: '1' }
+          ]
         }
         expect(user.nicknames.size).must_equal 3
         user.update(params)
@@ -221,11 +221,11 @@ describe Imyou::Nickname do
 
       it 'should reject blank name attributes' do
         params = {
-            imyou_nicknames_attributes: [
-                { name: 'hoge' },
-                { name: 'piyo' },
-                { name: '' }, # reject
-            ]
+          imyou_nicknames_attributes: [
+            { name: 'hoge' },
+            { name: 'piyo' },
+            { name: '' }, # reject
+          ]
         }
         expect(user.nicknames.size).must_equal 3
         user.update(params)
@@ -235,12 +235,12 @@ describe Imyou::Nickname do
 
       it 'complex conditions' do
         params = {
-            imyou_nicknames_attributes: [
-                { name: 'hoge' }, # create
-                { id: user.imyou_nicknames.first.id, _destroy: '1' }, # destroy
-                { id: user.imyou_nicknames.second.id, name: 'piyo' }, # update
-                { id: user.imyou_nicknames.last.id, name: '' }, #reject(not update)
-            ]
+          imyou_nicknames_attributes: [
+            { name: 'hoge' }, # create
+            { id: user.imyou_nicknames.first.id, _destroy: '1' }, # destroy
+            { id: user.imyou_nicknames.second.id, name: 'piyo' }, # update
+            { id: user.imyou_nicknames.last.id, name: '' }, # reject(not update)
+          ]
         }
         user.update(params)
         expect(user.nicknames).must_match_array %w(piyo baz hoge)
