@@ -51,7 +51,9 @@ module Imyou
 
         scope :partial_match_by_nickname, lambda { |nickname, with_name_column: true|
           if Gem::Version.new(ActiveRecord.version) >= Gem::Version.new(5)
-            records = left_outer_joins(:imyou_nicknames).where(Imyou::Nickname.arel_table[:name].matches("%#{sanitize_sql_like(nickname)}%", '\\'))
+            records = left_outer_joins(:imyou_nicknames).
+                      where(Imyou::Nickname.arel_table[:name].
+                      matches("%#{sanitize_sql_like(nickname)}%", '\\'))
             unless name_column.nil? || with_name_column == false
               records.or!(left_outer_joins(:imyou_nicknames).where(
                             arel_table[name_column].matches("%#{sanitize_sql_like(nickname)}%", '\\')
@@ -123,16 +125,12 @@ module Imyou
 
         def nicknames=(new_nicknames)
           if new_record?
-            new_nicknames&.each do |new_nickname|
-              imyou_nicknames.build(name: new_nickname)
-            end
+            new_nicknames&.each { |new_nickname| imyou_nicknames.build(name: new_nickname) }
           elsif new_nicknames.blank?
             remove_all_nicknames
           else
             imyou_nicknames.where.not(name: new_nicknames).delete_all
-            new_nicknames.each do |new_nickname|
-              imyou_nicknames.find_or_create_by(name: new_nickname)
-            end
+            new_nicknames.each { |new_nickname| imyou_nicknames.find_or_create_by(name: new_nickname) }
           end
         end
       end
