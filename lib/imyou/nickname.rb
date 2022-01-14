@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Imyou
   class Nickname < ::ActiveRecord::Base
     self.table_name = 'imyou_nicknames'
@@ -8,6 +10,6 @@ module Imyou
     default_scope { default_order }
 
     validates :name, presence: true
-    validates_uniqueness_of :name, scope: [:model_id, :model_type]
+    validates_uniqueness_of :name, scope: %i[model_id model_type]
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ImyouMigration < ActiveRecord::Migration<%= migration_version %>
   def self.up
     create_table :imyou_nicknames do |t|

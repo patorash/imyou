@@ -1,0 +1,26 @@
+require:
+  - rubocop-performance
+  - rubocop-rake
+  - rubocop-minitest
+
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 2.6
+  Exclude:
+    - 'lib/generators/imyou/migration/templates/active_record/migration.rb'
+
+Layout/LineLength:
+  AllowHeredoc: true
+  AllowURI: true
+
+Metrics/BlockLength:
+  IgnoredMethods:
+    - describe
+    - refine
+    - class_eval
+
+Layout/DotPosition:
+  EnforcedStyle: trailing
+
+Style/Documentation:
+  Enabled: false

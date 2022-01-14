@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'test_helper'
 
 describe Imyou::Nickname do
@@ -10,20 +12,20 @@ describe Imyou::Nickname do
     expect(NotUser).wont_be :has_imyou?
   end
 
-  it "should be a footprinter" do
+  it 'should be a footprinter' do
     expect(User).must_be :has_imyou?
   end
 
   describe 'If nickname is already registered,' do
     before do
-      %w(foo bar baz).each do |nickname|
+      %w[foo bar baz].each do |nickname|
         user.imyou_nicknames.create!(name: nickname)
         no_name_user.imyou_nicknames.create!(name: nickname)
       end
     end
 
     it 'user should get nicknames' do
-      expect(user.nicknames).must_equal %w(foo bar baz)
+      expect(user.nicknames).must_equal %w[foo bar baz]
     end
 
     it 'Same nickname should not be register by validation.' do
@@ -43,7 +45,7 @@ describe Imyou::Nickname do
       subject { User.with_nicknames.first }
 
       it 'should get nicknames' do
-        expect(user.nicknames).must_equal %w(foo bar baz)
+        expect(user.nicknames).must_equal %w[foo bar baz]
       end
     end
 
@@ -88,8 +90,8 @@ describe Imyou::Nickname do
     describe '#nicknames=' do
       describe 'If user is registerd,' do
         it 'register new nicknames' do
-          user.nicknames = %w(foo hoge bar)
-          expect(user.nicknames).must_match_array %w(foo hoge bar)
+          user.nicknames = %w[foo hoge bar]
+          expect(user.nicknames).must_match_array %w[foo hoge bar]
         end
 
         it 'can remove nicknames' do
@@ -105,10 +107,10 @@ describe Imyou::Nickname do
 
       describe 'If user is new_record,' do
         it 'build new nicknames' do
-          new_user.nicknames = %w(foo hoge bar)
+          new_user.nicknames = %w[foo hoge bar]
           expect(new_user.save_with_nicknames).must_equal true
           expect(new_user.imyou_nicknames.all?(&:persisted?)).must_equal true
-          expect(new_user.nicknames).must_match_array %w(foo hoge bar)
+          expect(new_user.nicknames).must_match_array %w[foo hoge bar]
         end
 
         it 'can remove nicknames' do
@@ -126,14 +128,14 @@ describe Imyou::Nickname do
 
       describe 'If user is invalid,' do
         it 'cannot save' do
-          invalid_user.nicknames = %w(foo hoge bar)
+          invalid_user.nicknames = %w[foo hoge bar]
           expect(invalid_user.save_with_nicknames).must_equal false
           expect(invalid_user.imyou_nicknames.all?(&:new_record?)).must_equal true
-          expect(invalid_user.nicknames).must_match_array %w(foo hoge bar)
+          expect(invalid_user.nicknames).must_match_array %w[foo hoge bar]
         end
 
         it 'cannot save!' do
-          invalid_user.nicknames = %w(foo hoge bar)
+          invalid_user.nicknames = %w[foo hoge bar]
           assert_raises ActiveRecord::RecordInvalid do
             invalid_user.save_with_nicknames!
           end
@@ -144,7 +146,7 @@ describe Imyou::Nickname do
     describe '#add_nickname' do
       it 'register new nickname' do
         expect(user.add_nickname('hoge')).must_be_instance_of Imyou::Nickname
-        expect(user.nicknames).must_match_array %w(foo hoge bar baz)
+        expect(user.nicknames).must_match_array %w[foo hoge bar baz]
       end
     end
 
@@ -152,18 +154,18 @@ describe Imyou::Nickname do
       describe 'If user registered' do
         it 'remove nickname' do
           expect(user.remove_nickname('foo')).must_equal true
-          expect(user.nicknames).must_match_array %w(bar baz)
+          expect(user.nicknames).must_match_array %w[bar baz]
         end
       end
 
       describe 'If user is new_record,' do
         before do
-          new_user.nicknames = %w(foo bar baz)
+          new_user.nicknames = %w[foo bar baz]
         end
 
         it 'remove nickname' do
           expect(new_user.remove_nickname('foo')).must_equal true
-          expect(new_user.nicknames).must_match_array %w(bar baz)
+          expect(new_user.nicknames).must_match_array %w[bar baz]
         end
       end
     end
@@ -179,7 +181,7 @@ describe Imyou::Nickname do
 
       describe 'If user is new_record,' do
         before do
-          new_user.nicknames = %w(foo bar baz)
+          new_user.nicknames = %w[foo bar baz]
         end
 
         it 'remove all nicknames' do
@@ -197,13 +199,13 @@ describe Imyou::Nickname do
           imyou_nicknames_attributes: [
             { name: 'hoge' },
             { name: 'piyo' },
-            { name: 'fuga' },
+            { name: 'fuga' }
           ]
         }
         expect(user.nicknames.size).must_equal 3
         user.update(params)
         expect(user.nicknames.size).must_equal 6
-        expect(user.nicknames).must_match_array %w(foo bar baz hoge piyo fuga)
+        expect(user.nicknames).must_match_array %w[foo bar baz hoge piyo fuga]
       end
 
       it 'should destroy nicknames' do
@@ -216,7 +218,7 @@ describe Imyou::Nickname do
         expect(user.nicknames.size).must_equal 3
         user.update(params)
         expect(user.nicknames.size).must_equal 1
-        expect(user.nicknames).must_match_array %w(baz)
+        expect(user.nicknames).must_match_array %w[baz]
       end
 
       it 'should reject blank name attributes' do
@@ -224,13 +226,13 @@ describe Imyou::Nickname do
           imyou_nicknames_attributes: [
             { name: 'hoge' },
             { name: 'piyo' },
-            { name: '' }, # reject
+            { name: '' } # reject
           ]
         }
         expect(user.nicknames.size).must_equal 3
         user.update(params)
         expect(user.nicknames.size).must_equal 5
-        expect(user.nicknames).must_match_array %w(foo bar baz hoge piyo)
+        expect(user.nicknames).must_match_array %w[foo bar baz hoge piyo]
       end
 
       it 'complex conditions' do
@@ -239,11 +241,11 @@ describe Imyou::Nickname do
             { name: 'hoge' }, # create
             { id: user.imyou_nicknames.first.id, _destroy: '1' }, # destroy
             { id: user.imyou_nicknames.second.id, name: 'piyo' }, # update
-            { id: user.imyou_nicknames.last.id, name: '' }, # reject(not update)
+            { id: user.imyou_nicknames.last.id, name: '' } # reject(not update)
           ]
         }
         user.update(params)
-        expect(user.nicknames).must_match_array %w(piyo baz hoge)
+        expect(user.nicknames).must_match_array %w[piyo baz hoge]
       end
     end
   end
