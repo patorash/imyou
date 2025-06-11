@@ -34,7 +34,7 @@ ActiveRecord::Schema.define do
   create_table :no_name_users, force: true
 end
 
-DatabaseCleaner.strategy = :transaction
+DatabaseCleaner.strategy = :truncation
 
 module Minitest
   class Spec
