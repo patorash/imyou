@@ -18,7 +18,9 @@ module Imyou
 
         scope :with_nicknames, -> { preload(:imyou_nicknames) }
 
-        scope :match_by_nickname, lambda { |nickname, with_name_column: true|
+        scope :match_by_nickname, lambda { |options = {}|
+          nickname = options[:nickname]
+          with_name_column = options.fetch(:with_name_column, true)
           if Gem::Version.new(ActiveRecord.version) >= Gem::Version.new(5)
             records = left_outer_joins(:imyou_nicknames).where(Imyou::Nickname.arel_table[:name].eq(nickname))
             unless name_column.nil? || with_name_column == false
@@ -49,7 +51,9 @@ module Imyou
           records
         }
 
-        scope :partial_match_by_nickname, lambda { |nickname, with_name_column: true|
+        scope :partial_match_by_nickname, lambda { |options = {}|
+          nickname = options[:nickname]
+          with_name_column = options.fetch(:with_name_column, true)
           if Gem::Version.new(ActiveRecord.version) >= Gem::Version.new(5)
             records = left_outer_joins(:imyou_nicknames).
                       where(Imyou::Nickname.arel_table[:name].
