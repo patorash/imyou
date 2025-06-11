@@ -34,5 +34,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubocop-rake', '~> 0.6'
   spec.add_development_dependency 'sqlite3', '~> 1.3'
   spec.add_development_dependency 'concurrent-ruby', '1.3.4'
+  spec.add_development_dependency 'mutex_m'
+  spec.add_development_dependency 'bigdecimal'
+  spec.add_development_dependency 'base64'
   spec.metadata['rubygems_mfa_required'] = 'true'
 end
