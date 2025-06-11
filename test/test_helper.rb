@@ -34,7 +34,11 @@ ActiveRecord::Schema.define do
   create_table :no_name_users, force: true
 end
 
-DatabaseCleaner.strategy = :truncation
+if ENV['BUNDLE_GEMFILE'].include?("rails_5.0.gemfile")
+  DatabaseCleaner.strategy = :truncation
+else
+  DatabaseCleaner.strategy = :transaction
+end
 
 module Minitest
   class Spec
