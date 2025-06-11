@@ -49,7 +49,7 @@ module Minitest
 end
 
 # @see https://stackoverflow.com/questions/20329387/how-to-assert-the-contents-of-an-array-indifferent-of-the-ordering
-module MiniTest
+module Minitest
   module Assertions
     def assert_matched_arrays(exp, act)
       exp_ary = exp.to_ary
@@ -61,7 +61,7 @@ module MiniTest
   end
 end
 
-module MiniTest
+module Minitest
   module Expectations
     infect_an_assertion :assert_matched_arrays, :must_match_array
   end
