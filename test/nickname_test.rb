@@ -51,38 +51,38 @@ describe Imyou::Nickname do
 
     describe '#match_by_nickname' do
       it 'should exists' do
-        expect(User.match_by_nickname(nickname: 'baz')).must_be :exists?
-        expect(User.match_by_nickname(nickname: 'az')).wont_be :exists?
+        expect(User.match_by_nickname('baz')).must_be :exists?
+        expect(User.match_by_nickname('az')).wont_be :exists?
 
-        expect(NoNameUser.match_by_nickname(nickname: 'baz')).must_be :exists?
-        expect(NoNameUser.match_by_nickname(nickname: 'az')).wont_be :exists?
+        expect(NoNameUser.match_by_nickname('baz')).must_be :exists?
+        expect(NoNameUser.match_by_nickname('az')).wont_be :exists?
       end
 
       it 'should search by users.name' do
-        expect(User.match_by_nickname(nickname: 'user_name')).must_be :exists?
+        expect(User.match_by_nickname('user_name')).must_be :exists?
       end
 
       describe 'If with_name_column = false' do
         it 'should not search by users.name' do
-          expect(User.match_by_nickname(nickname: "user_name", with_name_column: false)).wont_be :exists?
+          expect(User.match_by_nickname("user_name", with_name_column: false)).wont_be :exists?
         end
       end
     end
 
     describe '#partial_match_by_nickname' do
       it 'should exists' do
-        expect(User.partial_match_by_nickname(nickname: 'az')).must_be :exists?
-        expect(NoNameUser.partial_match_by_nickname(nickname: 'az')).must_be :exists?
+        expect(User.partial_match_by_nickname('az')).must_be :exists?
+        expect(NoNameUser.partial_match_by_nickname('az')).must_be :exists?
       end
 
       it 'should search by users.name' do
-        expect(User.partial_match_by_nickname(nickname: 'user')).must_be :exists?
-        expect(User.partial_match_by_nickname(nickname: 'er_na')).must_be :exists?
+        expect(User.partial_match_by_nickname('user')).must_be :exists?
+        expect(User.partial_match_by_nickname('er_na')).must_be :exists?
       end
 
       describe 'If with_name_column = false' do
         it 'should not search by users.name' do
-          expect(User.partial_match_by_nickname(nickname: 'user', with_name_column: false)).wont_be :exists?
+          expect(User.partial_match_by_nickname('user', with_name_column: false)).wont_be :exists?
         end
       end
     end
