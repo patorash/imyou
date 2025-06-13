@@ -3,7 +3,8 @@
 require 'minitest/autorun'
 require 'active_record'
 
-require 'database_cleaner/active_record'
+# database_cleaner 1～2系のどちらでも動くようにするため、パスを修正
+require 'database_cleaner'
 require 'imyou'
 
 Dir["#{Dir.pwd}/test/internal/app/models/*.rb"].sort.each { |f| require f }
@@ -34,11 +35,7 @@ ActiveRecord::Schema.define do
   create_table :no_name_users, force: true
 end
 
-if ENV['BUNDLE_GEMFILE'].include?("rails_5.0.gemfile")
-  DatabaseCleaner.strategy = :truncation
-else
-  DatabaseCleaner.strategy = :transaction
-end
+DatabaseCleaner.strategy = :transaction
 
 module Minitest
   class Spec
@@ -57,8 +54,10 @@ module Minitest
   module Assertions
     def assert_matched_arrays(exp, act)
       exp_ary = exp.to_ary
+
       assert_kind_of Array, exp_ary
       act_ary = act.to_ary
+
       assert_kind_of Array, act_ary
       assert_equal exp_ary.sort, act_ary.sort
     end
