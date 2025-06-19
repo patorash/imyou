@@ -18,7 +18,11 @@ module Imyou
 
         scope :with_nicknames, -> { preload(:imyou_nicknames) }
 
-        scope :match_by_nickname, lambda { |nickname, with_name_column: true|
+        # 本来はscopeで定義するべきだが、Ruby 3.2以降とActiveRecord 6.1系ではエラーになるため、
+        # 苦肉の策で特異メソッドとして定義する。
+        # Rails 6.1のサポートを終了したら、scopeに戻すこと。
+        # @see https://qiita.com/usk0513/items/c2968733415c806f56fc
+        define_singleton_method(:match_by_nickname) do |nickname, with_name_column: true|
           if Gem::Version.new(ActiveRecord.version) >= Gem::Version.new(5)
             records = left_outer_joins(:imyou_nicknames).where(Imyou::Nickname.arel_table[:name].eq(nickname))
             unless name_column.nil? || with_name_column == false
@@ -47,9 +51,9 @@ module Imyou
                       end
           end
           records
-        }
+        end
 
-        scope :partial_match_by_nickname, lambda { |nickname, with_name_column: true|
+        define_singleton_method(:partial_match_by_nickname) do |nickname, with_name_column: true|
           if Gem::Version.new(ActiveRecord.version) >= Gem::Version.new(5)
             records = left_outer_joins(:imyou_nicknames).
                       where(Imyou::Nickname.arel_table[:name].
@@ -82,7 +86,7 @@ module Imyou
                       end
           end
           records
-        }
+        end
 
         alias_method :save_with_nicknames, :save
         alias_method :save_with_nicknames!, :save!

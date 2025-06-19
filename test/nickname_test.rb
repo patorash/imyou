@@ -64,7 +64,7 @@ describe Imyou::Nickname do
 
       describe 'If with_name_column = false' do
         it 'should not search by users.name' do
-          expect(User.match_by_nickname('user_name', with_name_column: false)).wont_be :exists?
+          expect(User.match_by_nickname("user_name", with_name_column: false)).wont_be :exists?
         end
       end
     end
